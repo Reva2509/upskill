@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCT Services - Professional Service Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --secondary: #10b981;
+            --accent: #8b5cf6;
+        }
+        
+        .chat-message.customer { background-color: #dbeafe; }
+        .chat-message.merchant { background-color: #f0fdf4; }
+        
+        /* Animation for notifications */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .notification {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        /* Loading animation */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-handshake text-blue-500 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-gray-800">UCT Services</span>
+                    </div>
+                    <div class="hidden md:ml-6 md:flex md:space-x-8">
+                        <a href="#home" class="text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium">Home</a>
+                        <a href="#services" class="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium">Services</a>
+                        <a href="#merchants" class="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium">Merchants</a>
+                        <a href="#bookings" class="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium">Bookings</a>
+                        <a href="#chat" class="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium">Chat</a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <div class="hidden md:flex items-center space-x-4">
+                        <button onclick="toggleAuthModal()" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Login/Signup</button>
+                        <div class="relative" id="userDropdown" style="display: none;">
+                            <button onclick="toggleDropdown()" class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <span id="usernameDisplay">User</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div id="dropdownMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" style="display: none;">
+                                <a href="#dashboard" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</a>
+                                <a href="#bookings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Bookings</a>
+                                <a href="#chat" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Messages</a>
+                                <hr class="my-1">
+                                <a href="#" onclick="logout()" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="bg-gradient-to-r from-blue-50 to-emerald-50 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
+                    Find Trusted Professionals for
+                    <span class="text-blue-600">Every Service</span>
+                </h1>
+                <p class="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+                    From home cleaning to personal training, UCT Services connects you with verified professionals in your area. Book services instantly with secure payments.
+                </p>
+                <div class="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
+                    <div class="rounded-md shadow">
+                        <input type="text" id="searchInput" placeholder="What service do you need?" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
+                        <button onclick="searchServices()" class="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-3 md:text-lg md:px-8">
+                            <i class="fas fa-search mr-2"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-12 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8">Popular Services</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="servicesContainer">
+                <!-- Services will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Form -->
+    <section id="booking" class="py-12 bg-gray-50" style="display: none;">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white shadow-lg rounded-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Book Service</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Service Type</label>
+                        <input type="text" id="bookingService" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Date</label>
+                        <input type="date" id="bookingDate" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Time Slot</label>
+                        <select id="bookingTime" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                            <option>9:00 AM - 11:00 AM</option>
+                            <option>11:00 AM - 1:00 PM</option>
+                            <option>2:00 PM - 4:00 PM</option>
+                            <option>4:00 PM - 6:00 PM</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Address</label>
+                        <input type="text" id="bookingAddress" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" placeholder="Your address">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700">Special Instructions</label>
+                        <textarea id="bookingNotes" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" placeholder="Any special requirements..."></textarea>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-between">
+                    <button onclick="hideBookingForm()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
+                    <button onclick="confirmBooking()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Proceed to Payment</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" style="display: none;">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Complete Payment</h3>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Card Number</label>
+                    <input type="text" id="cardNumber" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" placeholder="4242 4242 4242 4242">
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Expiry</label>
+                        <input type="text" id="cardExpiry" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" placeholder="MM/YY">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">CVC</label>
+                        <input type="text" id="cardCvc" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" placeholder="123">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Amount</label>
+                    <div class="mt-1 text-xl font-bold text-gray-900">$<span id="paymentAmount">99</span></div>
+                </div>
+                <div class="flex justify-between mt-6">
+                    <button onclick="closePaymentModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
+                    <button onclick="processPayment()" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                        <i class="fas fa-lock mr-2"></i>Pay Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Interface -->
+    <div id="chatModal" class="fixed bottom-4 right-4 w-96 bg-white shadow-2xl rounded-lg z-40" style="display: none;">
+        <div class="bg-blue-600 text-white p-4 rounded-t-lg flex justify-between items-center">
+            <h3 class="font-bold"><i class="fas fa-comments mr-2"></i>Chat Support</h3>
+            <button onclick="toggleChat()" class="text-white"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="h-96 overflow-y-auto p-4" id="chatMessages">
+            <!-- Chat messages will appear here -->
+            <div class="text-center text-gray-500 text-sm">Chat with service provider</div>
+        </div>
+        <div class="p-4 border-t">
+            <div class="flex">
+                <input type="text" id="chatInput" placeholder="Type your message..." class="flex-grow border border-gray-300 rounded-l-lg p-2">
+                <button onclick="sendChatMessage()" class="bg-blue-600 text-white px-4 rounded-r-lg">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button onclick="toggleChat()" id="chatToggle" class="fixed bottom-4 right-4 bg-blue-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center z-30">
+        <i class="fas fa-comment-dots text-xl"></i>
+        <span id="unreadBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" style="display: none;">0</span>
+    </button>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" style="display: none;">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="flex border-b">
+                <button id="loginTab" class="flex-1 py-2 font-medium text-blue-600 border-b-2 border-blue-600">Login</button>
+                <button id="signupTab" class="flex-1 py-2 font-medium text-gray-500">Sign Up</button>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="mt-4">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="loginEmail" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="loginPassword" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                </div>
+                <div class="mb-4">
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="userType" value="customer" checked class="text-blue-600"> Customer
+                    </label>
+                    <label class="inline-flex items-center ml-4">
+                        <input type="radio" name="userType" value="merchant" class="text-blue-600"> Merchant
+                    </label>
+                </div>
+                <button onclick="login()" class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">Login</button>
+            </div>
+            
+            <!-- Signup Form -->
+            <div id="signupForm" class="mt-4" style="display: none;">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Full Name</label>
+                    <input type="text" id="signupName" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="signupEmail" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="signupPassword" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                </div>
+                <div class="mb-4">
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="signupUserType" value="customer" checked class="text-blue-600"> Customer
+                    </label>
+                    <label class="inline-flex items-center ml-4">
+                        <input type="radio" name="signupUserType" value="merchant" class="text-blue-600"> Merchant
+                    </label>
+                </div>
+                <button onclick="signup()" class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700">Create Account</button>
+            </div>
+            
+            <button onclick="toggleAuthModal()" class="w-full mt-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <section id="dashboard" class="py-12 bg-gray-50" style="display: none;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8">Dashboard</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Customer Dashboard -->
+                <div id="customerDashboard" class="lg:col-span-2">
+                    <div class="bg-white shadow-lg rounded-lg p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">My Bookings</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Service</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customerBookings" class="divide-y divide-gray-200">
+                                    <!-- Bookings will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white shadow-lg rounded-lg p-6 mt-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Invoice Generator</h3>
+                        <button onclick="generateInvoice()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                            <i class="fas fa-file-invoice mr-2"></i>Generate Latest Invoice
+                        </button>
+                        <div id="invoicePreview" class="mt-4 p-4 border rounded-md" style="display: none;">
+                            <!-- Invoice will appear here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Merchant Dashboard -->
+                <div id="merchantDashboard" class="lg:col-span-2" style="display: none;">
+                    <div class="bg-white shadow-lg rounded-lg p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Service Requests</h3>
+                        <div id="merchantRequests">
+                            <!-- Requests will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white shadow-lg rounded-lg p-6 mt-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Add New Service</h3>
+                        <div class="grid grid-cols-1 gap-4">
+                            <input type="text" id="newServiceName" placeholder="Service Name" class="border border-gray-300 rounded-md p-2">
+                            <textarea id="newServiceDesc" placeholder="Description" class="border border-gray-300 rounded-md p-2"></textarea>
+                            <input type="number" id="newServicePrice" placeholder="Price" class="border border-gray-300 rounded-md p-2">
+                            <button onclick="addNewService()" class="bg-green-600 text-white py-2 rounded-md hover:bg-green-700">Add Service</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sidebar -->
+                <div>
+                    <div class="bg-white shadow-lg rounded-lg p-6 mb-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Profile</h3>
+                        <div class="text-center">
+                            <div class="w-24 h-24 bg-blue-100 rounded-full mx-auto flex items-center justify-center text-blue-600 text-3xl mb-4">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h4 id="profileName" class="font-bold text-lg">John Doe</h4>
+                            <p id="profileType" class="text-gray-500">Customer</p>
+                            <div class="mt-4">
+                                <div class="flex justify-between mb-2">
+                                    <span>Total Bookings:</span>
+                                    <span id="totalBookings" class="font-bold">5</span>
+                                </div>
+                                <div class="flex justify-between mb-2">
+                                    <span>Total Spent:</span>
+                                    <span id="totalSpent" class="font-bold">$450</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white shadow-lg rounded-lg p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Notifications</h3>
+                        <div id="notifications" class="space-y-3">
+                            <!-- Notifications will appear here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Panel -->
+    <section id="adminPanel" class="py-12 bg-gray-100" style="display: none;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8">Admin Panel</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2">
+                    <div class="bg-white shadow-lg rounded-lg p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">All Users</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminUsers" class="divide-y divide-gray-200">
+                                    <!-- Users will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white shadow-lg rounded-lg p-6 mt-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">All Bookings</h3>
+                        <div id="adminBookings">
+                            <!-- All bookings will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="bg-white shadow-lg rounded-lg p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Platform Stats</h3>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-blue-50 rounded-lg">
+                                <div class="text-sm text-blue-600">Total Users</div>
+                                <div id="statUsers" class="text-2xl font-bold">124</div>
+                            </div>
+                            <div class="p-4 bg-green-50 rounded-lg">
+                                <div class="text-sm text-green-600">Total Bookings</div>
+                                <div id="statBookings" class="text-2xl font-bold">89</div>
+                            </div>
+                            <div class="p-4 bg-purple-50 rounded-lg">
+                                <div class="text-sm text-purple-600">Revenue</div>
+                                <div id="statRevenue" class="text-2xl font-bold">$8,450</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Invoice Modal -->
+    <div id="invoiceModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" style="display: none;">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Invoice</h3>
+                <button onclick="printInvoice()" class="bg-blue-600 text-white px-4 py-2 rounded-md">
+                    <i class="fas fa-print mr-2"></i>Print
+                </button>
+            </div>
+            <div id="invoiceContent" class="p-8 border rounded-lg">
+                <!-- Invoice content will be generated here -->
+            </div>
+            <button onclick="closeInvoiceModal()" class="w-full mt-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Close</button>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="fixed top-4 right-4 z-50 space-y-2">
+        <!-- Notifications will appear here -->
+    </div>
+
+    <!-- Backend Simulation (In-memory database) -->
+    <script>
+        // =============================================
+        // DATABASE SIMULATION (In-memory storage)
+        // =============================================
+        const database = {
+            // Users storage
+            users: [
+                { id: 1, name: "Admin User", email: "admin@uct.com", password: "admin123", type: "admin", token: "admin-token" },
+                { id: 2, name: "John Customer", email: "john@email.com", password: "customer123", type: "customer", token: "customer-token", bookings: 5, spent: 450 },
+                { id: 3, name: "Alice Merchant", email: "alice@merchant.com", password: "merchant123", type: "merchant", token: "merchant-token", services: 3, rating: 4.5 }
+            ],
+            
+            // Services storage
+            services: [
+                { id: 1, name: "Home Cleaning", category: "Cleaning", description: "Professional home cleaning service", price: 99, rating: 4.5, merchant: "CleanPro", duration: "3 hours" },
+                { id: 2, name: "AC Repair", category: "Repair", description: "AC installation and repair", price: 149, rating: 4.7, merchant: "CoolAir", duration: "2 hours" },
+                { id: 3, name: "Plumbing", category: "Repair", description: "All plumbing services", price: 89, rating: 4.3, merchant: "PipeMasters", duration: "1.5 hours" },
+                { id: 4, name: "Personal Training", category: "Fitness", description: "One-on-one fitness training", price: 199, rating: 4.8, merchant: "FitPro", duration: "1 hour" },
+                { id: 5, name: "Beauty Salon", category: "Beauty", description: "Haircut and styling", price: 49, rating: 4.4, merchant: "StyleHub", duration: "1 hour" },
+                { id: 6, name: "Electrician", category: "Repair", description: "Electrical repairs", price: 119, rating: 4.6, merchant: "SparkElectro", duration: "2 hours" }
+            ],
+            
+            // Bookings storage
+            bookings: [
+                { id: 1, customerId: 2, serviceId: 1, serviceName: "Home Cleaning", date: "2024-01-15", time: "2:00 PM - 4:00 PM", status: "completed", amount: 99, address: "123 Main St" },
+                { id: 2, customerId: 2, serviceId: 3, serviceName: "Plumbing", date: "2024-01-20", time: "11:00 AM - 1:00 PM", status: "confirmed", amount: 89, address: "123 Main St" }
+            ],
+            
+            // Chat messages storage
+            messages: [
+                { id: 1, sender: "customer", receiver: "merchant", text: "Hello, when can you come for cleaning?", time: "10:30 AM" },
+                { id: 2, sender: "merchant", receiver: "customer", text: "I can come tomorrow at 2 PM", time: "10:32 AM" }
+            ],
+            
+            // Notifications storage
+            notifications: [
+                { id: 1, userId: 2, text: "Your booking for Home Cleaning is confirmed", time: "2 hours ago", read: false },
+                { id: 2, userId: 2, text: "Payment of $99 completed successfully", time: "1 day ago", read: true }
+            ]
+        };
+
+        // =============================================
+        // STATE MANAGEMENT
+        // =============================================
+        let currentUser = null;
+        let currentService = null;
+        let socket = null;
+        let unreadMessages = 0;
+
+        // =============================================
+        // INITIALIZATION
+        // =============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadServices();
+            checkAuthStatus();
+            setupSocket();
+            updateNotifications();
+            
+            // Setup tab switching
+            document.getElementById('loginTab').addEventListener('click', function() {
+                showLoginForm();
+            });
+            
+            document.getElementById('signupTab').addEventListener('click', function() {
+                showSignupForm();
+            });
+            
+            // Check for saved token
+            const token = localStorage.getItem('uct_token');
+            if (token) {
+                const user = database.users.find(u => u.token === token);
+                if (user) {
+                    currentUser = user;
+                    updateUIAfterLogin();
+                }
+            }
+        });
+
+        // =============================================
+        // AUTHENTICATION FUNCTIONS
+        // =============================================
+        function showLoginForm() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('signupForm').style.display = 'none';
+            document.getElementById('loginTab').classList.add('text-blue-600', 'border-blue-600');
+            document.getElementById('loginTab').classList.remove('text-gray-500');
+            document.getElementById('signupTab').classList.add('text-gray-500');
+            document.getElementById('signupTab').classList.remove('text-blue-600', 'border-blue-600');
+        }
+
+        function showSignupForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'block';
+            document.getElementById('signupTab').classList.add('text-blue-600', 'border-blue-600');
+            document.getElementById('signupTab').classList.remove('text-gray-500');
+            document.getElementById('loginTab').classList.add('text-gray-500');
+            document.getElementById('loginTab').classList.remove('text-blue-600', 'border-blue-600');
+        }
+
+        function toggleAuthModal() {
+            const modal = document.getElementById('authModal');
+            modal.style.display = modal.style.display === 'none' ? 'block' : 'none';
+            showLoginForm();
+        }
+
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const userType = document.querySelector('input[name="userType"]:checked').value;
+            
+            // Simulate API call
+            const user = database.users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                // JWT token generation simulation
+                const token = `jwt-token-${Date.now()}`;
+                user.token = token;
+                localStorage.setItem('uct_token', token);
+                
+                currentUser = user;
+                showNotification('Login successful!', 'success');
+                updateUIAfterLogin();
+                toggleAuthModal();
+                
+                if (user.email === 'admin@uct.com') {
+                    showAdminPanel();
+                }
+            } else {
+                showNotification('Invalid credentials', 'error');
+            }
+        }
+
+        function signup() {
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const userType = document.querySelector('input[name="signupUserType"]:checked').value;
+            
+            if (!name || !email || !password) {
+                showNotification('Please fill all fields', 'error');
+                return;
+            }
+            
+            // Check if user exists
+            const existingUser = database.users.find(u => u.email === email);
+            if (existingUser) {
+                showNotification('User already exists', 'error');
+                return;
+            }
+            
+            // Create new user
+            const newUser = {
+                id: database.users.length + 1,
+                name: name,
+                email: email,
+                password: password,
+                type: userType,
+                token: `jwt-token-new-${Date.now()}`
+            };
+            
+            database.users.push(newUser);
+            currentUser = newUser;
+            localStorage.setItem('uct_token', newUser.token);
+            
+            showNotification('Account created successfully!', 'success');
+            updateUIAfterLogin();
+            toggleAuthModal();
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('uct_token');
+            document.getElementById('userDropdown').style.display = 'none';
+            document.querySelector('button[onclick="toggleAuthModal()"]').style.display = 'inline-block';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            showNotification('Logged out successfully', 'success');
+        }
+
+        function checkAuthStatus() {
+            const token = localStorage.getItem('uct_token');
+            if (token) {
+                const user = database.users.find(u => u.token === token);
+                if (user) {
+                    currentUser = user;
+                    updateUIAfterLogin();
+                }
+            }
+        }
+
+        function updateUIAfterLogin() {
+            document.getElementById('userDropdown').style.display = 'flex';
+            document.querySelector('button[onclick="toggleAuthModal()"]').style.display = 'none';
+            document.getElementById('usernameDisplay').textContent = currentUser.name.split(' ')[0];
+            
+            // Show appropriate dashboard
+            if (currentUser.type === 'customer') {
+                document.getElementById('customerDashboard').style.display = 'block';
+                document.getElementById('merchantDashboard').style.display = 'none';
+                loadCustomerBookings();
+            } else if (currentUser.type === 'merchant') {
+                document.getElementById('customerDashboard').style.display = 'none';
+                document.getElementById('merchantDashboard').style.display = 'block';
+                loadMerchantRequests();
+            }
+            
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('profileName').textContent = currentUser.name;
+            document.getElementById('profileType').textContent = currentUser.type.charAt(0).toUpperCase() + currentUser.type.slice(1);
+            
+            if (currentUser.bookings) {
+                document.getElementById('totalBookings').textContent = currentUser.bookings;
+                document.getElementById('totalSpent').textContent = '$' + currentUser.spent;
+            }
+            
+            updateNotifications();
+        }
+
+        // =============================================
+        // SERVICE MANAGEMENT
+        // =============================================
+        function loadServices() {
+            const container = document.getElementById('servicesContainer');
+            container.innerHTML = '';
+            
+            database.services.forEach(service => {
+                const serviceCard = `
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-900">${service.name}</h3>
+                                    <p class="text-sm text-gray-500">${service.category}</p>
+                                </div>
+                                <div class="bg-blue-100 text-blue-800 text-sm font-bold px-2 py-1 rounded">
+                                    $${service.price}
+                                </div>
+                            </div>
+                            <p class="mt-2 text-gray-600">${service.description}</p>
+                            <div class="mt-4 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="flex text-yellow-400">
+                                        ${generateStars(service.rating)}
+                                    </div>
+                                    <span class="ml-2 text-sm text-gray-600">${service.rating}</span>
+                                </div>
+                                <span class="text-sm text-gray-500">${service.duration}</span>
+                            </div>
+                            <div class="mt-4">
+                                <span class="text-sm text-gray-500">By: ${service.merchant}</span>
+                            </div>
+                            <button onclick="bookService(${service.id})" class="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">
+                                Book Now
+                            </button>
+                            <button onclick="showServiceDetails(${service.id})" class="mt-2 w-full border border-blue-600 text-blue-600 py-2 rounded-md hover:bg-blue-50">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += serviceCard;
+            });
+        }
+
+        function generateStars(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= Math.floor(rating)) {
+                    stars += '<i class="fas fa-star"></i>';
+                } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
+                    stars += '<i class="fas fa-star-half-alt"></i>';
+                } else {
+                    stars += '<i class="far fa-star"></i>';
+                }
+            }
+            return stars;
+        }
+
+        function searchServices() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = database.services.filter(service => 
+                service.name.toLowerCase().includes(query) || 
+                service.category.toLowerCase().includes(query) ||
+                service.description.toLowerCase().includes(query)
+            );
+            
+            const container = document.getElementById('servicesContainer');
+            container.innerHTML = '';
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<p class="col-span-4 text-center text-gray-500">No services found</p>';
+                return;
+            }
+            
+            filtered.forEach(service => {
+                const serviceCard = `
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold text-gray-900">${service.name}</h3>
+                            <p class="text-gray-600">${service.description}</p>
+                            <div class="mt-4 flex justify-between items-center">
+                                <span class="text-blue-600 font-bold">$${service.price}</span>
+                                <button onclick="bookService(${service.id})" class="bg-blue-600 text-white px-4 py-2 rounded-md">Book</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += serviceCard;
+            });
+        }
+
+        function bookService(serviceId) {
+            if (!currentUser) {
+                showNotification('Please login to book services', 'error');
+                toggleAuthModal();
+                return;
+            }
+            
+            const service = database.services.find(s => s.id === serviceId);
+            currentService = service;
+            
+            document.getElementById('bookingService').value = service.name;
+            document.getElementById('bookingDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('paymentAmount').textContent = service.price;
+            
+            document.getElementById('services').scrollIntoView();
+            document.getElementById('booking').style.display = 'block';
+        }
+
+        function hideBookingForm() {
+            document.getElementById('booking').style.display = 'none';
+        }
+
+        function confirmBooking() {
+            const date = document.getElementById('bookingDate').value;
+            const time = document.getElementById('bookingTime').value;
+            const address = document.getElementById('bookingAddress').value;
+            const notes = document.getElementById('bookingNotes').value;
+            
+            if (!date || !time || !address) {
+                showNotification('Please fill all required fields', 'error');
+                return;
+            }
+            
+            hideBookingForm();
+            document.getElementById('paymentAmount').textContent = currentService.price;
+            document.getElementById('paymentModal').style.display = 'block';
+        }
+
+        // =============================================
+        // PAYMENT SYSTEM
+        // =============================================
+        function closePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        function processPayment() {
+            const cardNumber = document.getElementById('cardNumber').value;
+            const cardExpiry = document.getElementById('cardExpiry').value;
+            const cardCvc = document.getElementById('cardCvc').value;
+            
+            if (!cardNumber || !cardExpiry || !cardCvc) {
+                showNotification('Please fill all payment details', 'error');
+                return;
+            }
+            
+            // Simulate payment processing
+            showNotification('Processing payment...', 'info');
+            
+            setTimeout(() => {
+                // Create booking
+                const newBooking = {
+                    id: database.bookings.length + 1,
+                    customerId: currentUser.id,
+                    serviceId: currentService.id,
+                    serviceName: currentService.name,
+                    date: document.getElementById('bookingDate').value,
+                    time: document.getElementById('bookingTime').value,
+                    status: 'confirmed',
+                    amount: currentService.price,
+                    address: document.getElementById('bookingAddress').value,
+                    notes: document.getElementById('bookingNotes').value
+                };
+                
+                database.bookings.push(newBooking);
+                
+                // Add notification
+                const notification = {
+                    id: database.notifications.length + 1,
+                    userId: currentUser.id,
+                    text: `Booking confirmed for ${currentService.name} - $${currentService.price}`,
+                    time: 'Just now',
+                    read: false
+                };
+                database.notifications.push(notification);
+                
+                // Simulate email notification
+                simulateEmailNotification(currentUser.email, 'Booking Confirmation', 
+                    `Your booking for ${currentService.name} has been confirmed for ${newBooking.date} at ${newBooking.time}.`);
+                
+                closePaymentModal();
+                showNotification('Payment successful! Booking confirmed.', 'success');
+                loadCustomerBookings();
+                updateNotifications();
+                
+                // Show chat option
+                toggleChat();
+            }, 2000);
+        }
+
+        // =============================================
+        // CHAT SYSTEM (Socket.io Simulation)
+        // =============================================
+        function setupSocket() {
+            // Simulate WebSocket connection
+            console.log('WebSocket connection established');
+        }
+
+        function toggleChat() {
+            const chatModal = document.getElementById('chatModal');
+            const isVisible = chatModal.style.display === 'block';
+            chatModal.style.display = isVisible ? 'none' : 'block';
+            
+            if (!isVisible) {
+                loadChatMessages();
+                unreadMessages = 0;
+                document.getElementById('unreadBadge').style.display = 'none';
+            }
+        }
+
+        function loadChatMessages() {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = '<div class="text-center text-gray-500 text-sm">Chat with service provider</div>';
+            
+            database.messages.forEach(msg => {
+                const messageClass = msg.sender === 'customer' ? 'customer' : 'merchant';
+                const alignClass = msg.sender === 'customer' ? 'justify-end' : 'justify-start';
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `flex ${alignClass} mb-2`;
+                messageDiv.innerHTML = `
+                    <div class="max-w-xs">
+                        <div class="chat-message ${messageClass} p-3 rounded-lg">
+                            <p>${msg.text}</p>
+                            <p class="text-xs text-gray-500 mt-1">${msg.time}</p>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(messageDiv);
+            });
+            
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add message to database
+            const newMessage = {
+                id: database.messages.length + 1,
+                sender: 'customer',
+                receiver: 'merchant',
+                text: message,
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            };
+            
+            database.messages.push(newMessage);
+            
+            // Clear input
+            input.value = '';
+            
+            // Reload messages
+            loadChatMessages();
+            
+            // Simulate auto-reply
+            setTimeout(() => {
+                const autoReply = {
+                    id: database.messages.length + 1,
+                    sender: 'merchant',
+                    receiver: 'customer',
+                    text: 'Thank you for your message. Our representative will get back to you shortly.',
+                    time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                };
+                database.messages.push(autoReply);
+                
+                if (document.getElementById('chatModal').style.display === 'none') {
+                    unreadMessages++;
+                    document.getElementById('unreadBadge').textContent = unreadMessages;
+                    document.getElementById('unreadBadge').style.display = 'flex';
+                }
+                
+                loadChatMessages();
+            }, 1000);
+        }
+
+        // =============================================
+        // DASHBOARD FUNCTIONS
+        // =============================================
+        function loadCustomerBookings() {
+            if (!currentUser) return;
+            
+            const container = document.getElementById('customerBookings');
+            container.innerHTML = '';
+            
+            const userBookings = database.bookings.filter(b => b.customerId === currentUser.id);
+            
+            userBookings.forEach(booking => {
+                const statusColor = booking.status === 'completed' ? 'bg-green-100 text-green-800' : 
+                                  booking.status === 'confirmed' ? 'bg-blue-100 text-blue-800' : 
+                                  'bg-yellow-100 text-yellow-800';
+                
+                const row = `
+                    <tr>
+                        <td class="px-4 py-3">${booking.serviceName}</td>
+                        <td class="px-4 py-3">${booking.date} ${booking.time}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 rounded-full text-xs ${statusColor}">
+                                ${booking.status}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">$${booking.amount}</td>
+                        <td class="px-4 py-3">
+                            <button onclick="viewBooking(${booking.id})" class="text-blue-600 hover:text-blue-800">View</button>
+                            ${booking.status === 'completed' ? 
+                                `<button onclick="addReview(${booking.id})" class="ml-2 text-green-600 hover:text-green-800">Review</button>` : ''}
+                        </td>
+                    </tr>
+                `;
+                container.innerHTML += row;
+            });
+        }
+
+        function loadMerchantRequests() {
+            const container = document.getElementById('merchantRequests');
+            container.innerHTML = '';
+            
+            // Get bookings for merchant's services
+            database.bookings.forEach(booking => {
+                const requestDiv = `
+                    <div class="border rounded-lg p-4 mb-3">
+                        <div class="flex justify-between">
+                            <div>
+                                <h4 class="font-bold">${booking.serviceName}</h4>
+                                <p class="text-sm text-gray-600">${booking.date} at ${booking.time}</p>
+                                <p class="text-sm text-gray-600">${booking.address}</p>
+                            </div>
+                            <div>
+                                <span class="font-bold">$${booking.amount}</span>
+                                <div class="mt-2">
+                                    <button onclick="updateBookingStatus(${booking.id}, 'accepted')" class="bg-green-600 text-white px-3 py-1 rounded text-sm">Accept</button>
+                                    <button onclick="updateBookingStatus(${booking.id}, 'rejected')" class="bg-red-600 text-white px-3 py-1 rounded text-sm ml-2">Reject</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += requestDiv;
+            });
+        }
+
+        function addNewService() {
+            const name = document.getElementById('newServiceName').value;
+            const desc = document.getElementById('newServiceDesc').value;
+            const price = document.getElementById('newServicePrice').value;
+            
+            if (!name || !desc || !price) {
+                showNotification('Please fill all fields', 'error');
+                return;
+            }
+            
+            const newService = {
+                id: database.services.length + 1,
+                name: name,
+                category: "Custom",
+                description: desc,
+                price: parseFloat(price),
+                rating: 0,
+                merchant: currentUser.name,
+                duration: "2 hours"
+            };
+            
+            database.services.push(newService);
+            
+            // Clear form
+            document.getElementById('newServiceName').value = '';
+            document.getElementById('newServiceDesc').value = '';
+            document.getElementById('newServicePrice').value = '';
+            
+            showNotification('Service added successfully!', 'success');
+            loadServices();
+        }
+
+        // =============================================
+        // ADMIN PANEL
+        // =============================================
+        function showAdminPanel() {
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            loadAdminUsers();
+            loadAdminBookings();
+            updateAdminStats();
+        }
+
+        function loadAdminUsers() {
+            const container = document.getElementById('adminUsers');
+            container.innerHTML = '';
+            
+            database.users.forEach(user => {
+                const row = `
+                    <tr>
+                        <td class="px-4 py-3">${user.name}</td>
+                        <td class="px-4 py-3">${user.email}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 rounded-full text-xs ${user.type === 'admin' ? 'bg-purple-100 text-purple-800' : 
+                                user.type === 'merchant' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">
+                                ${user.type}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Active</span>
+                        </td>
+                    </tr>
+                `;
+                container.innerHTML += row;
+            });
+        }
+
+        function loadAdminBookings() {
+            const container = document.getElementById('adminBookings');
+            container.innerHTML = '';
+            
+            database.bookings.forEach(booking => {
+                const customer = database.users.find(u => u.id === booking.customerId);
+                const bookingDiv = `
+                    <div class="border rounded-lg p-4 mb-3">
+                        <div class="flex justify-between">
+                            <div>
+                                <h4 class="font-bold">${booking.serviceName}</h4>
+                                <p class="text-sm text-gray-600">Customer: ${customer ? customer.name : 'Unknown'}</p>
+                                <p class="text-sm text-gray-600">${booking.date} at ${booking.time}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="font-bold">$${booking.amount}</span>
+                                <p class="text-sm ${booking.status === 'completed' ? 'text-green-600' : 
+                                    booking.status === 'confirmed' ? 'text-blue-600' : 'text-yellow-600'}">
+                                    ${booking.status}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += bookingDiv;
+            });
+        }
+
+        function updateAdminStats() {
+            document.getElementById('statUsers').textContent = database.users.length;
+            document.getElementById('statBookings').textContent = database.bookings.length;
+            
+            const totalRevenue = database.bookings.reduce((sum, booking) => sum + booking.amount, 0);
+            document.getElementById('statRevenue').textContent = '$' + totalRevenue;
+        }
+
+        // =============================================
+        // INVOICE GENERATOR
+        // =============================================
+        function generateInvoice() {
+            const latestBooking = database.bookings[database.bookings.length - 1];
+            const invoiceContent = document.getElementById('invoiceContent');
+            
+            const invoiceHTML = `
+                <div class="bg-white p-8">
+                    <div class="flex justify-between mb-8">
+                        <div>
+                            <h1 class="text-3xl font-bold text-blue-600">UCT Services</h1>
+                            <p class="text-gray-600">Invoice #INV-${String(latestBooking.id).padStart(4, '0')}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-gray-600">Date: ${new Date().toLocaleDateString()}</p>
+                            <p class="text-gray-600">Status: <span class="text-green-600 font-bold">PAID</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-8 mb-8">
+                        <div>
+                            <h3 class="font-bold text-gray-700 mb-2">Bill To:</h3>
+                            <p>${currentUser.name}</p>
+                            <p>${currentUser.email}</p>
+                            <p>${latestBooking.address}</p>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-700 mb-2">Service Provider:</h3>
+                            <p>${latestBooking.serviceName}</p>
+                            <p>Service Date: ${latestBooking.date}</p>
+                            <p>Time: ${latestBooking.time}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-b py-4 mb-6">
+                        <div class="grid grid-cols-4 text-gray-600 font-bold mb-2">
+                            <div>Description</div>
+                            <div>Date</div>
+                            <div>Time</div>
+                            <div class="text-right">Amount</div>
+                        </div>
+                        <div class="grid grid-cols-4 py-2">
+                            <div>${latestBooking.serviceName}</div>
+                            <div>${latestBooking.date}</div>
+                            <div>${latestBooking.time}</div>
+                            <div class="text-right">$${latestBooking.amount}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <div class="w-64">
+                            <div class="flex justify-between mb-2">
+                                <span>Subtotal:</span>
+                                <span>$${latestBooking.amount}</span>
+                            </div>
+                            <div class="flex justify-between mb-2">
+                                <span>Tax (10%):</span>
+                                <span>$${(latestBooking.amount * 0.1).toFixed(2)}</span>
+                            </div>
+                            <div class="flex justify-between text-xl font-bold border-t pt-2">
+                                <span>Total:</span>
+                                <span>$${(latestBooking.amount * 1.1).toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 pt-8 border-t text-center text-gray-500 text-sm">
+                        <p>Thank you for choosing UCT Services!</p>
+                        <p>For any queries, contact support@uctservices.com</p>
+                    </div>
+                </div>
+            `;
+            
+            invoiceContent.innerHTML = invoiceHTML;
+            document.getElementById('invoiceModal').style.display = 'block';
+        }
+
+        function closeInvoiceModal() {
+            document.getElementById('invoiceModal').style.display = 'none';
+        }
+
+        function printInvoice() {
+            const printContent = document.getElementById('invoiceContent').innerHTML;
+            const originalContent = document.body.innerHTML;
+            
+            document.body.innerHTML = printContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+            location.reload(); // Reload to restore functionality
+        }
+
+        // =============================================
+        // NOTIFICATION SYSTEM
+        // =============================================
+        function updateNotifications() {
+            if (!currentUser) return;
+            
+            const container = document.getElementById('notifications');
+            container.innerHTML = '';
+            
+            const userNotifications = database.notifications.filter(n => n.userId === currentUser.id);
+            
+            userNotifications.forEach(notification => {
+                const notifDiv = document.createElement('div');
+                notifDiv.className = `p-3 rounded-lg ${notification.read ? 'bg-gray-50' : 'bg-blue-50'}`;
+                notifDiv.innerHTML = `
+                    <p class="text-sm">${notification.text}</p>
+                    <p class="text-xs text-gray-500 mt-1">${notification.time}</p>
+                `;
+                container.appendChild(notifDiv);
+            });
+        }
+
+        function showNotification(message, type) {
+            const container = document.getElementById('notificationContainer');
+            
+            const notification = document.createElement('div');
+            notification.className = `notification p-4 rounded-lg shadow-lg ${type === 'success' ? 'bg-green-100 text-green-800' : 
+                                    type === 'error' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 
+                        type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s';
+                setTimeout(() => {
+                    container.removeChild(notification);
+                }, 500);
+            }, 5000);
+        }
+
+        function simulateEmailNotification(to, subject, body) {
+            console.log(`=== EMAIL NOTIFICATION ===`);
+            console.log(`To: ${to}`);
+            console.log(`Subject: ${subject}`);
+            console.log(`Body: ${body}`);
+            console.log(`==========================`);
+            
+            showNotification('Email notification sent!', 'info');
+        }
+
+        // =============================================
+        // HELPER FUNCTIONS
+        // =============================================
+        function toggleDropdown() {
+            const menu = document.getElementById('dropdownMenu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function viewBooking(bookingId) {
+            const booking = database.bookings.find(b => b.id === bookingId);
+            if (booking) {
+                alert(`Booking Details:\nService: ${booking.serviceName}\nDate: ${booking.date}\nTime: ${booking.time}\nStatus: ${booking.status}\nAddress: ${booking.address}\nAmount: $${booking.amount}`);
+            }
+        }
+
+        function updateBookingStatus(bookingId, status) {
+            const booking = database.bookings.find(b => b.id === bookingId);
+            if (booking) {
+                booking.status = status;
+                showNotification(`Booking ${status} successfully`, 'success');
+                loadMerchantRequests();
+            }
+        }
+
+        function addReview(bookingId) {
+            const rating = prompt('Rate this service (1-5 stars):');
+            if (rating >= 1 && rating <= 5) {
+                const review = prompt('Add your review:');
+                if (review) {
+                    showNotification('Review submitted successfully!', 'success');
+                }
+            }
+        }
+
+        function showServiceDetails(serviceId) {
+            const service = database.services.find(s => s.id === serviceId);
+            if (service) {
+                const details = `
+                    Service: ${service.name}
+                    Category: ${service.category}
+                    Price: $${service.price}
+                    Duration: ${service.duration}
+                    Rating: ${service.rating}/5
+                    Provider: ${service.merchant}
+                    Description: ${service.description}
+                `;
+                alert(details);
+            }
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches('#userDropdown button')) {
+                const dropdowns = document.getElementsByClassName("dropdown-menu");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.style.display === 'block') {
+                        openDropdown.style.display = 'none';
+                    }
+                }
+            }
+        };
+    </script>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">UCT Services</h3>
+                    <p class="text-gray-400">Connecting customers with trusted service providers since 2024.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#home" class="text-gray-400 hover:text-white">Home</a></li>
+                        <li><a href="#services" class="text-gray-400 hover:text-white">Services</a></li>
+                        <li><a href="#dashboard" class="text-gray-400 hover:text-white">Dashboard</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Services</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Home Cleaning</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">AC Repair</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Plumbing</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Contact</h4>
+                    <ul class="space-y-2">
+                        <li class="text-gray-400">support@uctservices.com</li>
+                        <li class="text-gray-400">+1 (555) 123-4567</li>
+                        <li class="text-gray-400">123 Service St, City</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
+                <p>&copy; 2024 UCT Services. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- Report Toggle Button -->
+    <button onclick="toggleReport()" class="fixed bottom-20 right-4 bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg flex items-center z-30">
+        <i class="fas fa-file-alt mr-2"></i> Report
+    </button>
+
+    <script>
+        function toggleReport() {
+            const report = document.getElementById('projectReport');
+            report.style.display = report.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+
+</body>
+</html>
