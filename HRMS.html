@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HRMS - Human Resource Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--light);
+            padding: 10px 20px;
+            border-radius: 25px;
+        }
+
+        .role-badge {
+            background: var(--secondary);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .role-admin { background: #e74c3c; }
+        .role-hr { background: #9b59b6; }
+        .role-employee { background: #3498db; }
+
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-tab {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            border-right: 1px solid #eee;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .nav-tab:hover {
+            background: var(--light);
+            color: var(--primary);
+        }
+
+        .nav-tab.active {
+            background: var(--secondary);
+            color: white;
+        }
+
+        /* Main Content */
+        .content {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-height: 500px;
+        }
+
+        /* Dashboard Styles */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            opacity: 0.9;
+        }
+
+        /* Form Styles */
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .data-table th {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table tr:hover {
+            background: var(--light);
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        /* Login Page */
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .login-container h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary);
+        }
+
+        .role-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 1rem 0;
+        }
+
+        .role-option {
+            padding: 1rem;
+            text-align: center;
+            background: var(--light);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .role-option:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .role-option.selected {
+            background: var(--secondary);
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+        .status-present { background: #d4edda; color: #155724; }
+        .status-absent { background: #f8d7da; color: #721c24; }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .nav-tab {
+                flex: 1;
+                text-align: center;
+                padding: 0.75rem;
+            }
+            
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page (Initial View) -->
+    <div id="loginPage" class="login-container">
+        <h2>HRMS Login</h2>
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="loginUsername" class="form-control" placeholder="Enter username" value="admin">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" class="form-control" placeholder="Enter password" value="admin123">
+        </div>
+        <div class="form-group">
+            <label>Select Role</label>
+            <div class="role-selector">
+                <div class="role-option" onclick="selectRole('Admin')" id="roleAdmin">Admin</div>
+                <div class="role-option" onclick="selectRole('HR')" id="roleHR">HR</div>
+                <div class="role-option" onclick="selectRole('Employee')" id="roleEmployee">Employee</div>
+            </div>
+        </div>
+        <button onclick="login()" class="btn btn-primary" style="width: 100%;">Login</button>
+        <div id="loginMessage" style="margin-top: 1rem; color: var(--danger);"></div>
+        
+        <!-- Demo Credentials -->
+        <div style="margin-top: 2rem; padding: 1rem; background: var(--light); border-radius: 5px; font-size: 0.9rem;">
+            <strong>Demo Credentials:</strong><br>
+            Admin: admin / admin123<br>
+            HR: hr / hr123<br>
+            Employee: employee / emp123
+        </div>
+    </div>
+
+    <!-- Main Application (Hidden Initially) -->
+    <div id="mainApp" style="display: none;">
+        <!-- Header -->
+        <div class="container">
+            <div class="header">
+                <div class="logo">
+                    <h1>HR<span>MS</span></h1>
+                    <p>Human Resource Management System</p>
+                </div>
+                <div class="user-info">
+                    <span id="currentUsername">User</span>
+                    <span id="currentRole" class="role-badge role-admin">Admin</span>
+                    <button onclick="logout()" class="btn btn-danger btn-small">Logout</button>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="nav-tabs" id="navigation">
+                <div class="nav-tab active" onclick="showTab('dashboard')">📊 Dashboard</div>
+                <div class="nav-tab" onclick="showTab('employees')">👥 Employees</div>
+                <div class="nav-tab" onclick="showTab('departments')">🏢 Departments</div>
+                <div class="nav-tab" onclick="showTab('attendance')">📅 Attendance</div>
+                <div class="nav-tab" onclick="showTab('leave')">🏖️ Leave</div>
+                <div class="nav-tab" onclick="showTab('payroll')">💰 Payroll</div>
+                <div class="nav-tab" onclick="showTab('reports')">📈 Reports</div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="content" id="contentArea">
+                <!-- Content will be dynamically loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Modal -->
+    <div id="employeeModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Add Employee</h2>
+            <form id="employeeForm" onsubmit="saveEmployee(event)">
+                <input type="hidden" id="employeeId">
+                
+                <div class="form-group">
+                    <label>Employee ID</label>
+                    <input type="text" id="empId" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="fullName" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" id="phone" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Department</label>
+                    <select id="department" class="form-control" required>
+                        <option value="">Select Department</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Position</label>
+                    <input type="text" id="position" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Salary</label>
+                    <input type="number" id="salary" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Date of Joining</label>
+                    <input type="date" id="doj" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea id="address" class="form-control" rows="3"></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" onclick="closeModal()" class="btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Leave Modal -->
+    <div id="leaveModal" class="modal">
+        <div class="modal-content">
+            <h2>Apply Leave</h2>
+            <form id="leaveForm" onsubmit="applyLeave(event)">
+                <div class="form-group">
+                    <label>Leave Type</label>
+                    <select id="leaveType" class="form-control" required>
+                        <option value="">Select Type</option>
+                        <option value="Sick">Sick Leave</option>
+                        <option value="Casual">Casual Leave</option>
+                        <option value="Annual">Annual Leave</option>
+                        <option value="Emergency">Emergency Leave</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>From Date</label>
+                    <input type="date" id="fromDate" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>To Date</label>
+                    <input type="date" id="toDate" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Reason</label>
+                    <textarea id="leaveReason" class="form-control" rows="3" required></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" onclick="closeModal()" class="btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Apply</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ====================
+        // DATA STORAGE (In-memory database simulation)
+        // ====================
+        class Database {
+            constructor() {
+                this.users = [
+                    { id: 1, username: 'admin', password: 'admin123', role: 'Admin' },
+                    { id: 2, username: 'hr', password: 'hr123', role: 'HR' },
+                    { id: 3, username: 'employee', password: 'emp123', role: 'Employee', empId: 'EMP003' }
+                ];
+                
+                this.departments = [
+                    { id: 1, name: 'Human Resources', manager: 'Sarah Johnson', totalEmployees: 8 },
+                    { id: 2, name: 'Information Technology', manager: 'Michael Chen', totalEmployees: 15 },
+                    { id: 3, name: 'Finance', manager: 'Robert Williams', totalEmployees: 12 },
+                    { id: 4, name: 'Marketing', manager: 'Lisa Anderson', totalEmployees: 10 },
+                    { id: 5, name: 'Operations', manager: 'David Miller', totalEmployees: 20 }
+                ];
+                
+                this.employees = [
+                    { 
+                        id: 1, empId: 'EMP001', fullName: 'John Smith', 
+                        email: 'john@company.com', phone: '123-456-7890',
+                        department: 'Information Technology', position: 'Senior Developer',
+                        salary: 75000, doj: '2022-01-15', address: '123 Main St, City'
+                    },
+                    { 
+                        id: 2, empId: 'EMP002', fullName: 'Sarah Johnson', 
+                        email: 'sarah@company.com', phone: '234-567-8901',
+                        department: 'Human Resources', position: 'HR Manager',
+                        salary: 85000, doj: '2021-03-10', address: '456 Oak Ave, City'
+                    },
+                    { 
+                        id: 3, empId: 'EMP003', fullName: 'Michael Chen', 
+                        email: 'michael@company.com', phone: '345-678-9012',
+                        department: 'Information Technology', position: 'IT Manager',
+                        salary: 95000, doj: '2020-11-20', address: '789 Pine Rd, City'
+                    }
+                ];
+                
+                this.attendance = [
+                    { id: 1, empId: 'EMP001', date: new Date().toISOString().split('T')[0], status: 'Present', checkIn: '09:00', checkOut: '17:00' },
+                    { id: 2, empId: 'EMP002', date: new Date().toISOString().split('T')[0], status: 'Present', checkIn: '08:45', checkOut: '17:30' },
+                    { id: 3, empId: 'EMP003', date: new Date().toISOString().split('T')[0], status: 'Absent', checkIn: '-', checkOut: '-' }
+                ];
+                
+                this.leaves = [
+                    { id: 1, empId: 'EMP001', empName: 'John Smith', type: 'Sick', fromDate: '2024-01-10', toDate: '2024-01-12', reason: 'Flu', status: 'Approved' },
+                    { id: 2, empId: 'EMP002', empName: 'Sarah Johnson', type: 'Annual', fromDate: '2024-01-15', toDate: '2024-01-20', reason: 'Vacation', status: 'Pending' },
+                    { id: 3, empId: 'EMP003', empName: 'Michael Chen', type: 'Casual', fromDate: '2024-01-05', toDate: '2024-01-05', reason: 'Personal', status: 'Rejected' }
+                ];
+                
+                this.payroll = [
+                    { id: 1, empId: 'EMP001', empName: 'John Smith', month: 'January 2024', basic: 60000, allowances: 10000, deductions: 5000, netSalary: 65000, status: 'Paid' },
+                    { id: 2, empId: 'EMP002', empName: 'Sarah Johnson', month: 'January 2024', basic: 70000, allowances: 12000, deductions: 7000, netSalary: 75000, status: 'Paid' }
+                ];
+            }
+            
+            // Employee CRUD operations
+            getEmployees() {
+                return this.employees;
+            }
+            
+            addEmployee(employee) {
+                employee.id = this.employees.length + 1;
+                this.employees.push(employee);
+                return employee;
+            }
+            
+            updateEmployee(id, employeeData) {
+                const index = this.employees.findIndex(e => e.id === id);
+                if (index !== -1) {
+                    this.employees[index] = { ...this.employees[index], ...employeeData };
+                    return this.employees[index];
+                }
+                return null;
+            }
+            
+            deleteEmployee(id) {
+                const index = this.employees.findIndex(e => e.id === id);
+                if (index !== -1) {
+                    this.employees.splice(index, 1);
+                    return true;
+                }
+                return false;
+            }
+            
+            // Department operations
+            getDepartments() {
+                return this.departments;
+            }
+            
+            // Attendance operations
+            getAttendance() {
+                return this.attendance;
+            }
+            
+            markAttendance(record) {
+                record.id = this.attendance.length + 1;
+                this.attendance.push(record);
+                return record;
+            }
+            
+            // Leave operations
+            getLeaves() {
+                return this.leaves;
+            }
+            
+            applyLeave(leave) {
+                leave.id = this.leaves.length + 1;
+                leave.status = 'Pending';
+                this.leaves.push(leave);
+                return leave;
+            }
+            
+            updateLeaveStatus(id, status) {
+                const index = this.leaves.findIndex(l => l.id === id);
+                if (index !== -1) {
+                    this.leaves[index].status = status;
+                    return this.leaves[index];
+                }
+                return null;
+            }
+            
+            // Payroll operations
+            getPayroll() {
+                return this.payroll;
+            }
+            
+            // User authentication
+            authenticate(username, password) {
+                return this.users.find(user => 
+                    user.username === username && user.password === password
+                );
+            }
+            
+            // Statistics
+            getStatistics() {
+                return {
+                    totalEmployees: this.employees.length,
+                    totalDepartments: this.departments.length,
+                    presentToday: this.attendance.filter(a => a.status === 'Present').length,
+                    pendingLeaves: this.leaves.filter(l => l.status === 'Pending').length,
+                    totalPayroll: this.payroll.reduce((sum, p) => sum + p.netSalary, 0)
+                };
+            }
+        }
+
+        // ====================
+        // APPLICATION STATE
+        // ====================
+        const db = new Database();
+        let currentUser = null;
+        let currentRole = null;
+        let selectedRole = 'Admin';
+
+        // ====================
+        // UTILITY FUNCTIONS
+        // ====================
+        function selectRole(role) {
+            selectedRole = role;
+            document.querySelectorAll('.role-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            document.getElementById(`role${role}`).classList.add('selected');
+        }
+
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // For demo, allow login with any credentials if matches demo users
+            const user = db.authenticate(username, password);
+            
+            if (user || (username && password)) {
+                currentUser = user || { username, role: selectedRole };
+                currentRole = currentUser.role;
+                
+                // Update UI
+                document.getElementById('currentUsername').textContent = currentUser.username;
+                document.getElementById('currentRole').textContent = currentRole;
+                document.getElementById('currentRole').className = `role-badge role-${currentRole.toLowerCase()}`;
+                
+                // Show main app, hide login
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                
+                // Load dashboard
+                showTab('dashboard');
+                
+                // Set navigation based on role
+                setupNavigation();
+            } else {
+                document.getElementById('loginMessage').textContent = 'Invalid credentials!';
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            currentRole = null;
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'block';
+            document.getElementById('loginMessage').textContent = '';
+        }
+
+        function setupNavigation() {
+            const nav = document.getElementById('navigation');
+            const tabs = nav.querySelectorAll('.nav-tab');
+            
+            // Hide certain tabs based on role
+            tabs.forEach(tab => {
+                const tabText = tab.textContent;
+                if (currentRole === 'Employee') {
+                    if (tabText.includes('Dashboard') || tabText.includes('Leave') || tabText.includes('Payroll')) {
+                        tab.style.display = 'flex';
+                    } else {
+                        tab.style.display = 'none';
+                    }
+                } else if (currentRole === 'HR') {
+                    if (tabText.includes('Reports')) {
+                        tab.style.display = 'none';
+                    } else {
+                        tab.style.display = 'flex';
+                    }
+                }
+            });
+        }
+
+        function showTab(tabName) {
+            // Update active tab
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Load appropriate content
+            switch(tabName) {
+                case 'dashboard':
+                    loadDashboard();
+                    break;
+                case 'employees':
+                    loadEmployees();
+                    break;
+                case 'departments':
+                    loadDepartments();
+                    break;
+                case 'attendance':
+                    loadAttendance();
+                    break;
+                case 'leave':
+                    loadLeave();
+                    break;
+                case 'payroll':
+                    loadPayroll();
+                    break;
+                case 'reports':
+                    loadReports();
+                    break;
+            }
+        }
+
+        // ====================
+        // DASHBOARD
+        // ====================
+        function loadDashboard() {
+            const stats = db.getStatistics();
+            const html = `
+                <h2>Dashboard</h2>
+                <p>Welcome back, ${currentUser.username}!</p>
+                
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <h3>${stats.totalEmployees}</h3>
+                        <p>Total Employees</p>
+                    </div>
+                    <div class="card">
+                        <h3>${stats.totalDepartments}</h3>
+                        <p>Departments</p>
+                    </div>
+                    <div class="card">
+                        <h3>${stats.presentToday}</h3>
+                        <p>Present Today</p>
+                    </div>
+                    <div class="card">
+                        <h3>${stats.pendingLeaves}</h3>
+                        <p>Pending Leaves</p>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 2rem;">
+                    <div>
+                        <h3>Recent Employees</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Department</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${db.getEmployees().slice(0, 5).map(emp => `
+                                        <tr>
+                                            <td>${emp.empId}</td>
+                                            <td>${emp.fullName}</td>
+                                            <td>${emp.department}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3>Pending Leaves</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Employee</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${db.getLeaves().filter(l => l.status === 'Pending').slice(0, 5).map(leave => `
+                                        <tr>
+                                            <td>${leave.empName}</td>
+                                            <td>${leave.type}</td>
+                                            <td><span class="status-badge status-${leave.status.toLowerCase()}">${leave.status}</span></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('contentArea').innerHTML = html;
+        }
+
+        // ====================
+        // EMPLOYEE MANAGEMENT
+        // ====================
+        function loadEmployees() {
+            const employees = db.getEmployees();
+            const canEdit = currentRole !== 'Employee';
+            
+            const html = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2>Employee Management</h2>
+                    ${canEdit ? `<button onclick="openEmployeeModal()" class="btn btn-primary">➕ Add Employee</button>` : ''}
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th>Position</th>
+                                <th>Salary</th>
+                                ${canEdit ? '<th>Actions</th>' : ''}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${employees.map(emp => `
+                                <tr>
+                                    <td>${emp.empId}</td>
+                                    <td>${emp.fullName}</td>
+                                    <td>${emp.email}</td>
+                                    <td>${emp.department}</td>
+                                    <td>${emp.position}</td>
+                                    <td>$${emp.salary.toLocaleString()}</td>
+                                    ${canEdit ? `
+                                    <td class="action-buttons">
+                                        <button onclick="editEmployee(${emp.id})" class="btn btn-warning btn-small">✏️ Edit</button>
+                                        <button onclick="deleteEmployee(${emp.id})" class="btn btn-danger btn-small">🗑️ Delete</button>
+                                    </td>
+                                    ` : ''}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            document.getElementById('contentArea').innerHTML = html;
+        }
+
+        function openEmployeeModal(employee = null) {
+            const modal = document.getElementById('employeeModal');
+            const title = document.getElementById('modalTitle');
+            const form = document.getElementById('employeeForm');
+            
+            // Populate department dropdown
+            const deptSelect = document.getElementById('department');
+            deptSelect.innerHTML = '<option value="">Select Department</option>' +
+                db.getDepartments().map(dept => 
+                    `<option value="${dept.name}">${dept.name}</option>`
+                ).join('');
+            
+            if (employee) {
+                title.textContent = 'Edit Employee';
+                document.getElementById('employeeId').value = employee.id;
+                document.getElementById('empId').value = employee.empId;
+                document.getElementById('fullName').value = employee.fullName;
+                document.getElementById('email').value = employee.email;
+                document.getElementById('phone').value = employee.phone;
+                document.getElementById('department').value = employee.department;
+                document.getElementById('position').value = employee.position;
+                document.getElementById('salary').value = employee.salary;
+                document.getElementById('doj').value = employee.doj;
+                document.getElementById('address').value = employee.address || '';
+            } else {
+                title.textContent = 'Add Employee';
+                form.reset();
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('employeeModal').style.display = 'none';
+            document.getElementById('leaveModal').style.display = 'none';
+        }
+
+        function saveEmployee(event) {
+            event.preventDefault();
+            
+            const employee = {
+                empId: document.getElementById('empId').value,
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                department: document.getElementById('department').value,
+                position: document.getElementById('position').value,
+                salary: parseFloat(document.getElementById('salary').value),
+                doj: document.getElementById('doj').value,
+                address: document.getElementById('address').value
+            };
+            
+            const employeeId = document.getElementById('employeeId').value;
+            
+            if (employeeId) {
+                db.updateEmployee(parseInt(employeeId), employee);
+            } else {
+                db.addEmployee(employee);
+            }
+            
+            closeModal();
+            loadEmployees();
+            alert('Employee saved successfully!');
+        }
+
+        function editEmployee(id) {
+            const employee = db.getEmployees().find(e => e.id === id);
+            if (employee) {
+                openEmployeeModal(employee);
+            }
+        }
+
+        function deleteEmployee(id) {
+            if (confirm('Are you sure you want to delete this employee?')) {
+                db.deleteEmployee(id);
+                loadEmployees();
+                alert('Employee deleted successfully!');
+            }
+        }
+
+        // ====================
+        // DEPARTMENT MANAGEMENT
+        // ====================
+        function loadDepartments() {
+            const departments = db.getDepartments();
+            
+            const html = `
+                <h2>Department Management</h2>
+                
+                <div class="dashboard-cards" style="margin-top: 2rem;">
+                    ${departments.map(dept => `
+                        <div class="card">
+                            <h3>${dept.name}</h3>
+                            <p>Manager: ${dept.manager}</p>
+                            <p>Employees: ${dept.totalEmployees}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <h3>Department Statistics</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Department</th>
+                                    <th>Total Employees</th>
+                                    <th>Manager</th>
+                                    <th>Average Salary</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${departments.map(dept => {
+                                    const deptEmployees = db.getEmployees().filter(e => e.department === dept.name);
+                                    const avgSalary = deptEmployees.length > 0 ? 
+                                        deptEmployees.reduce((sum, e) => sum + e.salary, 0) / deptEmployees.length : 0;
+                                    
+                                    return `
+                                        <tr>
+                                            <td>${dept.name}</td>
+                                            <td>${deptEmployees.length}</td>
+                                            <td>${dept.manager}</td>
+                                            <td>$${avgSalary.toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('contentArea').innerHTML = html;
+        }
+
+        // ====================
+        // ATTENDANCE TRACKING
+        // ====================
+        function loadAttendance() {
+            const attendance = db.getAttendance();
+            const employees = db.getEmployees();
+            const today = new Date().toISOString().split('T')[0];
+            
+            const html = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2>Attendance Tracking</h2>
+                    <div>
+                        <input type="date" id="attendanceDate" value="${today}" class="form-control" style="width: 200px; display: inline-block;">
+                        <button onclick="loadAttendance()" class="btn btn-primary">Filter</button>
+                    </div>
+                </div>
+                
+                ${currentRole !== 'Employee' ? `
+                <div style="margin-bottom: 2rem;">
+                    <h3>Mark Attendance</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Employee ID</th>
+                                    <th>Name</th>
+                                    <th>Status</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${employees.map(emp => {
+                                    const todayRecord = attendance.find(a => a.empId === emp.empId && a.date === today);
+                                    return `
+                                        <tr>
+                                            <td>${emp.empId}</td>
+                                            <td>${emp.fullName}</td>
+                                            <td>
+                                                <select id="status_${emp.empId}" class="form-control">
+                                                    <option value="Present" ${todayRecord?.status === 'Present' ? 'selected' : ''}>Present</option>
+                                                    <option value="Absent" ${todayRecord?.status === 'Absent' ? 'selected' : ''}>Absent</option>
+                                                    <option value="Leave" ${todayRecord?.status === 'Leave' ? 'selected' : ''}>Leave</option>
+                                                    <option value="Half-day" ${todayRecord?.status === 'Half-day' ? 'selected' : ''}>Half-day</option>
+                                                </select>
+                                            </td>
+                                            <td><input type="time" id="checkin_${emp.empId}" value="${todayRecord?.checkIn || '09:00'}" class="form-control"></td>
+                                            <td><input type="time" id="checkout_${emp.empId}" value="${todayRecord?.checkOut || '17:00'}" class="form-control"></td>
+                                            <td><button onclick="saveAttendance('${emp.empId}', '${emp.fullName}')" class="btn btn-success btn-small">Save</button></td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <h3>Attendance History</h3>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Employee ID</th>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>Check In</th>
+                                <th>Check Out</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${attendance.map(record => {
+                                const emp = employees.find(e => e.empId === record.empId);
+                                return `
+                                    <tr>
+                                        <td>${record.date}</td>
+                                        <td>${record.empId}</td>
+                                        <td>${emp?.fullName || 'Unknown'}</td>
+                                        <td><span class="status-badge status-${record.status.toLowerCase()}">${record.status}</span></td>
+                                        <td>${record.checkIn}</td>
+                                        <td>${record.checkOut}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            document.getElementById('contentArea').innerHTML = html;
+        }
+
+        function saveAttendance(empId, empName) {
+            const date = document.getElementById('attendanceDate').value;
+            const status = document.getElementById(`status_${empId}`).value;
+            const checkIn = document.getElementById(`checkin_${empId}`).value;
+            const checkOut = document.getElementById(`checkout_${empId}`).value;
+            
+            db.markAttendance({ empId, empName, date, status, checkIn, checkOut });
+            alert('Attendance saved successfully!');
+        }
+
+        // ====================
+        // LEAVE MANAGEMENT
+        // ====================
+        function loadLeave() {
+            const leaves = db.getLeaves();
+            const currentEmpId = currentUser.empId || 'EMP001';
+            
+            const html = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2>Leave Management</h2>
+                    ${currentRole === 'Employee' ? 
+                        `<button onclick="openLeaveModal()" class="btn btn-primary">🏖️ Apply Leave</button>` : ''}
+                </div>
+                
+                ${currentRole !== 'Employee' ? `
+                <div style="margin-bottom: 2rem;">
+                    <h3>Leave Approvals</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Type</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${leaves.filter(l => l.status === 'Pending').map(leave => `
+                                    <tr>
+                                        <td>${leave.empName}</td>
+                                        <td>${leave.type}</td>
+                                        <td>${leave.fromDate}</td>
+                                        <td>${leave.toDate}</td>
+                                        <td>${leave.reason}</td>
+                                        <td><span class="status-badge status-pending">${leave.status}</span></td>
+                                        <td class="action-buttons">
+                                            <button onclick="updateLeaveStatus(${leave.id}, 'Approved')" class="btn btn-success btn-small">✓ Approve</button>
+                                            <button onclick="updateLeaveStatus(${leave.id}, 'Rejected')" class="btn btn-danger btn-small">✗ Reject</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <h3>${currentRole === 'Employee' ? 'My Leave History' : 'All Leaves'}</h3>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Type</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                ${currentRole !== 'Employee' ? '<th>Days</th>' : ''}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${leaves.filter(leave => currentRole === 'Employee' ? leave.empId === currentEmpId : true)
+                            .map(leave => {
+                                const from = new Date(leave.fromDate);
+                                const to = new Date(leave.toDate);
+                                const days = Math.ceil((to - from) / (1000 * 60 * 60 * 24)) + 1;
+                                
+                                return `
+                                    <tr>
+                                        <td>${leave.empName}</td>
+                                        <td>${leave.type}</td>
+                                        <td>${leave.fromDate}</td>
+                                        <td>${leave.toDate}</td>
+                                        <td>${leave.reason}</td>
+                                        <td><span class="status-badge status-${leave.status.toLowerCase()}">${leave.status}</span></td>
+                                        ${currentRole !== 'Employee' ? `<td>${days}</td>` : ''}
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            document.getElementById('contentArea').innerHTML = html;
+        }
+
+        function openLeaveModal() {
+            document.getElementById('leaveModal').style.display = 'flex';
+        }
+
+        function applyLeave(event) {
+            event.preventDefault();
+            
+            const leave = {
+                empId: currentUser.empId || 'EMP001',
+                empName: currentUser.username,
+                type: document.getElementById('leaveType').value,
+                fromDate: document.getElementById('fromDate').value,
+                toDate: document.getElementById('toDate').value,
+                reason: document.getElementById('leaveReason').value
+            };
+            
+            db.applyLeave(leave);
+            closeModal();
+            loadLeave();
+            alert('Leave application submitted successfully!');
+        }
+
+        function updateLeaveStatus(id, status) {
+            db.updateLeaveStatus(id, status);
+            loadLeave();
+            alert(`Leave ${status.toLowerCase()}!`);
+        }
+
+        // ====================
+        // PAYROLL MANAGEMENT
+        // ====================
+        function loadPayroll() {
+            const payroll = db.getPayroll();
+            const currentEmpId = currentUser.empId || 'EMP001';
+            
+            const html = `
+                <h2>Payroll Management</h2>
+                
+                ${currentRole !== 'Employee' ? `
+                <div style="margin-bottom: 2rem;">
+                    <h3>Generate Payroll</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; background: var(--light); padding: 2rem; border-radius: 10px;">
+                        <div class="form-group">
+                            <label>Select Month</label>
+                            <input type="month" id="payrollMonth" class="form-control" value="2024-01">
+                        </div>
+                        <div class="form-group">
+                            <label>Select Employee</label>
+                            <select id="payrollEmployee" class="form-control">
+                                <option value="">All Employees</option>
+                                ${db.getEmployees().map(emp => 
+                                    `<option value="${emp.empId}">${emp.fullName} (${emp.empId})</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+                        <div style="grid-column: span 2;">
+                            <button onclick="generatePayroll()" class="btn btn-primary">Generate Payroll</button>
+                            <button onclick="calculateSalaries()" class="btn btn-success">Calculate All Salaries</button>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <h3>${currentRole === 'Employee' ? 'My Salary Slips' : 'Payroll Records'}</h3>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Employee</th>
+                                <th>Basic</th>
+                                <th>Allowances</th>
+                                <th>Deductions</th>
+                                <th>Net Salary</th>
+                                <th>Status</th>
+                                ${currentRole !== 'Employee' ? '<th>Action</th>' : ''}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${payroll.filter(p => currentRole === 'Employee' ? p.empId === currentEmpId : true)
+                            .map(p => `
+                                <tr>
+                                    <td>${p.month}</td>
+                                    <td>${p.empName}</td>
+                                    <td>$${p.basic.toLocaleString()}</td>
+                                    <td>$${p.allowances.toLocaleString()}</td>
+                                    <td>$${p.deductions.toLocaleString()}</td>
+                                    <td><strong>$${p.netSalary.toLocaleString()}</strong></td>
+                                    <td><span class="status-badge status-${p.status.toLowerCase()}">${p.status}</span></td>
+                                    ${currentRole !== 'Employee' ? `
+                                    <td>
+                                        <button onclick="downloadPayslip(${p.id})" class="btn btn-primary btn-small">📄 Download</button>
+                                    </td>
+                                    ` : ''}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="margin-top: 2rem; background: var(--light); padding: 1.5rem; border-radius: 10px;">
+                    <h3>Salary Summary</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        <div>
+                            <h4>Total Payroll</h4>
+                            <p style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">
+                                $${payroll.reduce((sum, p) => sum + p.netSalary, 0).toLocaleString()}
+                            </p>
+                        </div>
+                        <div>
+                            <h4>Average Salary</h4>
+                            <p style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">
+                                $${(payroll.reduce((sum, p) => sum + p.netSalary, 0) / payroll.length || 0).toLocaleString(undefined, {maximumFractionDigits: 0})}
+                            </p>
+                        </div>
+                        <div>
+                            <h4>Paid Employees</h4>
+                            <p style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">
+                                ${payroll.filter(p => p.status === 'Paid').length}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('contentArea').innerHTML = html;
+        }
+
+        function generatePayroll() {
+            const month = document.getElementById('payrollMonth').value;
+            const empId = document.getElementById('payrollEmployee').value;
+            
+            alert(`Payroll generated for ${empId || 'all employees'} for ${month}`);
+            // In a real app, this would generate payroll records
+        }
+
+        function calculateSalaries() {
+            db.getEmployees().forEach(emp => {
+                // Simple salary calculation
+                const basic = emp.salary;
+                const allowances = basic * 0.2; // 20% allowances
+                const deductions = basic * 0.1; // 10% deductions
+                const netSalary = basic + allowances - deductions;
+                
+                // Add to payroll if not exists
+                const existing = db.payroll.find(p => p.empId === emp.empId && p.month === 'January 2024');
+                if (!existing) {
+                    db.payroll.push({
+                        id: db.payroll.length + 1,
+                        empId: emp.empId,
+                        empName: emp.fullName,
+                        month: 'January 2024',
+                        basic: basic,
+                        allowances: allowances,
+                        deductions: deductions,
+                        netSalary: netSalary,
+                        status: 'Paid'
+                    });
+                }
+            });
+            
+            loadPayroll();
+            alert('Salaries calculated for all employees!');
+        }
+
+        function downloadPayslip(id) {
+            const payroll = db.payroll.find(p => p.id === id);
+            if (payroll) {
+                const content = `
+                    PAYSLIP - ${payroll.month}
+                    -------------------------
+                    Employee: ${payroll.empName}
+                    Employee ID: ${payroll.empId}
+                    
+                    Earnings:
+                    - Basic Salary: $${payroll.basic}
+                    - Allowances: $${payroll.allowances}
+                    
+                    Deductions:
+                    - Total Deductions: $${payroll.deductions}
+                    
+                    Net Salary: $${payroll.netSalary}
+                    Status: ${payroll.status}
+                `;
+                
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `payslip-${payroll.empId}-${payroll.month}.txt`;
+                a.click();
+            }
+        }
+
+        // ====================
+        // REPORTS
+        // ====================
+        function loadReports() {
+            const html = `
+                <h2>Reports & Analytics</h2>
+                
+                <div class="dashboard-cards">
+                    <div class="card" onclick="generateReport('attendance')" style="cursor: pointer;">
+                        <h3>📊</h3>
+                        <p>Attendance Report</p>
+                    </div>
+                    <div class="card" onclick="generateReport('leave')" style="cursor: pointer;">
+                        <h3>📈</h3>
+                        <p>Leave Analysis</p>
+                    </div>
+                    <div class="card" onclick="generateReport('payroll')" style="cursor: pointer;">
+                        <h3>💰</h3>
+                        <p>Payroll Summary</p>
+                    </div>
+                    <div class="card" onclick="generateReport('employee')" style="cursor: pointer;">
+                        <h3>👥</h3>
+                        <p>Employee Statistics</p>
+                    </div>
+                </div>
+                
+                <div id="reportContent" style="margin-top: 2rem;">
+                    <h3>Select a report type to generate</h3>
+                    <p>Reports will be displayed here. You can also export them as PDF or Excel.</p>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <button onclick="exportReport()" class="btn btn-success">📄 Export as PDF</button>
+                    <button onclick="exportExcel()" class="btn btn-primary">📊 Export as Excel</button>
+                </div>
+            `;
+            
+            document.getElementById('contentArea').innerHTML = html;
+        }
+
+        function generateReport(type) {
+            let reportHTML = '';
+            
+            switch(type) {
+                case 'attendance':
+                    reportHTML = `
+                        <h3>Attendance Report</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Employee</th>
+                                        <th>Present Days</th>
+                                        <th>Absent Days</th>
+                                        <th>Leave Days</th>
+                                        <th>Attendance %</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${db.getEmployees().map(emp => {
+                                        const empAttendance = db.getAttendance().filter(a => a.empId === emp.empId);
+                                        const present = empAttendance.filter(a => a.status === 'Present').length;
+                                        const absent = empAttendance.filter(a => a.status === 'Absent').length;
+                                        const leave = empAttendance.filter(a => a.status === 'Leave').length;
+                                        const total = empAttendance.length;
+                                        const percentage = total > 0 ? ((present / total) * 100).toFixed(1) : 0;
+                                        
+                                        return `
+                                            <tr>
+                                                <td>${emp.fullName}</td>
+                                                <td>${present}</td>
+                                                <td>${absent}</td>
+                                                <td>${leave}</td>
+                                                <td>${percentage}%</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'leave':
+                    reportHTML = `
+                        <h3>Leave Analysis Report</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Leave Type</th>
+                                        <th>Total Applications</th>
+                                        <th>Approved</th>
+                                        <th>Rejected</th>
+                                        <th>Pending</th>
+                                        <th>Approval Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${['Sick', 'Casual', 'Annual', 'Emergency'].map(type => {
+                                        const leaves = db.getLeaves().filter(l => l.type === type);
+                                        const approved = leaves.filter(l => l.status === 'Approved').length;
+                                        const rejected = leaves.filter(l => l.status === 'Rejected').length;
+                                        const pending = leaves.filter(l => l.status === 'Pending').length;
+                                        const total = leaves.length;
+                                        const rate = total > 0 ? ((approved / total) * 100).toFixed(1) : 0;
+                                        
+                                        return `
+                                            <tr>
+                                                <td>${type}</td>
+                                                <td>${total}</td>
+                                                <td>${approved}</td>
+                                                <td>${rejected}</td>
+                                                <td>${pending}</td>
+                                                <td>${rate}%</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'payroll':
+                    reportHTML = `
+                        <h3>Payroll Summary Report</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Department</th>
+                                        <th>Total Employees</th>
+                                        <th>Total Salary</th>
+                                        <th>Average Salary</th>
+                                        <th>Highest Salary</th>
+                                        <th>Lowest Salary</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${db.getDepartments().map(dept => {
+                                        const empInDept = db.getEmployees().filter(e => e.department === dept.name);
+                                        const totalSalary = empInDept.reduce((sum, e) => sum + e.salary, 0);
+                                        const avgSalary = empInDept.length > 0 ? totalSalary / empInDept.length : 0;
+                                        const highest = empInDept.length > 0 ? Math.max(...empInDept.map(e => e.salary)) : 0;
+                                        const lowest = empInDept.length > 0 ? Math.min(...empInDept.map(e => e.salary)) : 0;
+                                        
+                                        return `
+                                            <tr>
+                                                <td>${dept.name}</td>
+                                                <td>${empInDept.length}</td>
+                                                <td>$${totalSalary.toLocaleString()}</td>
+                                                <td>$${avgSalary.toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+                                                <td>$${highest.toLocaleString()}</td>
+                                                <td>$${lowest.toLocaleString()}</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'employee':
+                    reportHTML = `
+                        <h3>Employee Statistics Report</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Metric</th>
+                                        <th>Value</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Total Employees</td>
+                                        <td>${db.getEmployees().length}</td>
+                                        <td>Across ${db.getDepartments().length} departments</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Gender Distribution</td>
+                                        <td>N/A</td>
+                                        <td>Data not available in demo</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Average Salary</td>
+                                        <td>$${(db.getEmployees().reduce((sum, e) => sum + e.salary, 0) / db.getEmployees().length || 0).toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+                                        <td>Range: $${Math.min(...db.getEmployees().map(e => e.salary)).toLocaleString()} - $${Math.max(...db.getEmployees().map(e => e.salary)).toLocaleString()}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Average Tenure</td>
+                                        <td>1.5 years</td>
+                                        <td>Calculated from joining dates</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Turnover Rate</td>
+                                        <td>0%</td>
+                                        <td>No employee exits in demo data</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            document.getElementById('reportContent').innerHTML = reportHTML;
+        }
+
+        function exportReport() {
+            alert('Report exported as PDF (simulated in demo)');
+            // In a real app, this would generate a PDF
+        }
+
+        function exportExcel() {
+            alert('Report exported as Excel (simulated in demo)');
+            // In a real app, this would generate an Excel file
+        }
+
+        // ====================
+        // INITIALIZATION
+        // ====================
+        window.onload = function() {
+            // Set default date values
+            const today = new Date().toISOString().split('T')[0];
+            const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            
+            // Set default values for leave form
+            document.getElementById('fromDate').value = today;
+            document.getElementById('toDate').value = nextWeek;
+            
+            // Select default role
+            selectRole('Admin');
+        };
+    </script>
+</body>
+</html>
